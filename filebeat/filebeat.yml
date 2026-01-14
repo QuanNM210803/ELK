@@ -1,0 +1,21 @@
+filebeat.inputs:
+  - type: container
+    enabled: true
+    paths:
+      - /var/lib/docker/containers/*/*.log
+
+processors:
+  - add_docker_metadata: {}
+  - drop_event:
+      when:
+        not:
+          or:
+            - equals:
+                docker.container.name: "user-service-cvconnect"
+            - equals:
+                docker.container.name: "core-service-cvconnect"
+            - equals:
+                docker.container.name: "notify-service-cvconnect"
+
+output.logstash:
+  hosts: ["logstash:5044"]
