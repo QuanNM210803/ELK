@@ -1,19 +1,25 @@
+fields:
+    server_ip: "${SERVER_IP:172.18.0.2}"
+fields_under_root: true
+
 filebeat.inputs:
   - type: container
     enabled: true
     paths:
       - /var/lib/docker/containers/*/*.log
-#    multiline.type: pattern
-#    multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
-#    multiline.negate: true
-#    multiline.match: after
-#    multiline.max_lines: 10
-#    multiline.timeout: 5s
     include_lines:
       - '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
 
 processors:
   - add_docker_metadata: {}
+  - drop_fields:
+      fields:
+        - "container.labels"
+        - "agent"
+        - "ecs"
+        - "host"
+        - "input"
+      ignore_missing: true
   - drop_event:
       when:
         not:
